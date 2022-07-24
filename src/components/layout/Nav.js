@@ -22,7 +22,7 @@ function TopNav() {
     return (
         <Navbar className="bg-slate-600" expand="md">
             <Container className="py-4">
-                <div className="no-underline text-gray-300 hover:text-white font-serif text-3xl hover:cursor-pointer">
+                <div className="no-underline text-gray-300 hover:text-white font-serif text-2xl hover:cursor-pointer">
                     Xpense-Tracker
                 </div>
                 <Navbar.Toggle
@@ -34,10 +34,13 @@ function TopNav() {
                         {user?._id ? (
                             <div>
                                 <span className="text-2xl text-gray-300 mr-5 font-serif">
-                                    Welcome {user.name}
+                                    Welcome{' '}
+                                    <span className="text-3xl text-neutral-50">
+                                        {user.name}
+                                    </span>
                                 </span>
                                 <i
-                                    className="fa fa-sign-out text-2xl text-gray-100 hover:cursor-pointer"
+                                    className="fa fa-sign-out text-2xl text-gray-300 hover:cursor-pointer hover:text-gray-100"
                                     aria-hidden="true"
                                     onClick={handleOnLogout}
                                 ></i>

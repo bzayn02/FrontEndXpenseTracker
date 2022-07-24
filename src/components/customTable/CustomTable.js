@@ -1,15 +1,20 @@
 import React from 'react';
 
-export const CustomTable = ({ expenses, handleOnDelete }) => {
+export const CustomTable = ({ displayExpenses, handleOnDelete }) => {
+    const total = displayExpenses?.reduce(
+        (expense, currentValue) => expense + currentValue.amount,
+        0
+    );
+
     return (
         <div className="mt-3">
             <ul className="bg-blue-200 p-3 font-light rounded-md ">
-                {!expenses.length ? (
+                {!displayExpenses?.length ? (
                     <span className="text-xl text-center">
                         No expense to show
                     </span>
                 ) : (
-                    expenses.map((expense, i) => (
+                    displayExpenses.map((expense, i) => (
                         <li
                             key={i}
                             className="font-bold flex justify-between border-gray-600 border-b-2"
@@ -31,6 +36,15 @@ export const CustomTable = ({ expenses, handleOnDelete }) => {
                         </li>
                     ))
                 )}
+                <li className="p-1 font-bold flex justify-between border-gray-600">
+                    <span className="flex items-center justify-center">
+                        Total
+                    </span>
+                    <span>
+                        $ {total}
+                        {'       '}
+                    </span>
+                </li>
             </ul>
         </div>
     );

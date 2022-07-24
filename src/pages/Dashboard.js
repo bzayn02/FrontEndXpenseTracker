@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { EtForm } from '../components/etForm/EtForm';
@@ -9,6 +10,11 @@ import {
     postExpenses,
 } from '../helper/AxiosHelper';
 import { Alert, Spinner } from 'react-bootstrap';
+import FilterForm from '../components/filterForm/FilterForm';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -20,17 +26,36 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [expenses, setExpenses] = useState([]);
 
+    const [displayExpenses, setDisplayExpenses] = useState([]);
+    const [fetch, setFetch] = useState(true);
+
     useEffect(() => {
         const user = JSON.parse(sessionStorage.getItem('user'));
         if (!user?._id) {
             navigate('/');
         }
-        fetchExpenses();
-    }, [navigate]);
+        fetch && fetchExpenses();
+        setFetch(false);
+
+        !displayExpenses.length && setDisplayExpenses(expenses);
+    }, [navigate, expenses, displayExpenses]);
 
     const fetchExpenses = async () => {
         const data = await getExpenses();
         data?.status === 'success' && setExpenses(data.expenses);
+    };
+
+    const handleOnFilter = (filterData) => {
+        //filter the data and pass to setDisplayExpenses
+        const filteredData = displayExpenses?.filter(
+            (expense) =>
+                dayjs(expense?.date).isSameOrAfter(
+                    dayjs(filterData?.fromdate)
+                ) &&
+                dayjs(expense?.date).isSameOrBefore(dayjs(filterData?.todate))
+        );
+
+        filteredData?.length && setDisplayExpenses(filteredData);
     };
 
     const handleOnPost = async (formData) => {
@@ -51,7 +76,9 @@ const Dashboard = () => {
     };
     return (
         <MainLayout>
-            <span className="text-2xl">Dashboard</span>
+            <span className="flex justify-center text-3xl uppercase">
+                Track your expenses
+            </span>
             <hr />
             {isLoading && <Spinner variant="dark" animation="grow" />}
             {reply.message && (
@@ -62,7 +89,12 @@ const Dashboard = () => {
                 </Alert>
             )}
             <EtForm handleOnPost={handleOnPost} />
-            <CustomTable expenses={expenses} handleOnDelete={handleOnDelete} />
+            <FilterForm handleOnFilter={handleOnFilter} />
+            <CustomTable
+                handleOnFilter={handleOnFilter}
+                displayExpenses={displayExpenses || expenses}
+                handleOnDelete={handleOnDelete}
+            />
         </MainLayout>
     );
 };
